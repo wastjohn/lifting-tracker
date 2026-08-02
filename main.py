@@ -120,7 +120,8 @@ col4.metric("Avg. SWR", current_SWR, d_SWR, border=True)
 
 
 # lift plot
-lift_container = lift_col.container(border=True)
+lift_container = lift_col.container(border=True, height="stretch")
+lift_container.subheader("Exercise")
 lifttype = lift_container.selectbox("Select an exercise to see your history", all_lifts)
 
 lift = all_PRs[all_PRs["Exercise"] == f"{lifttype}"].dropna(axis=1)
@@ -137,7 +138,8 @@ lift_container.plotly_chart(lift_plot)
 
 # weight plot
 weight_fig = px.scatter(data, x="Date", y="Weight", color="Lifting day?" , trendline="ols", trendline_scope="overall")
-weight_container = weight_col.container(border=True)
+weight_container = weight_col.container(border=True, height="stretch")
+weight_container.subheader("Weight")
 weight_container.plotly_chart(weight_fig)
 
 
