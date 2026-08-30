@@ -68,7 +68,7 @@ def get_all_lift_stats(colname:str):
         lift_stats = get_lift_stats(lift_df)
         df = pd.concat([df, lift_stats], ignore_index=True)
         df["Date"] = data["Date"]
-        df["Lift"] = data["Lifting day?"]
+        df["Lift"] = data["Lifting day"]
         df["Weight"] = data["Weight"]
     df = df[df["Max Reps"] != 0]
     return df
@@ -85,7 +85,7 @@ def get_most_recent(colname:str):
 st.title("Strength Performance")  # create title
 
 # calculate PRs and maxes
-all_lifts = data.columns.tolist()[5:]
+all_lifts = data.columns.tolist()[14:70]
 all_PRs = pd.DataFrame()
 
 for l in all_lifts:
@@ -137,7 +137,7 @@ lift_container.plotly_chart(lift_plot)
 
 
 # weight plot
-weight_fig = px.scatter(data, x="Date", y="Weight", color="Lifting day?" , trendline="ols", trendline_scope="overall")
+weight_fig = px.scatter(data, x="Date", y="Weight", color="Lifting day" , trendline="ols", trendline_scope="overall")
 weight_container = weight_col.container(border=True, height="stretch")
 weight_container.subheader("Weight")
 weight_container.plotly_chart(weight_fig)
