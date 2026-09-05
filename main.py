@@ -112,8 +112,18 @@ maxes["E1RM (Epley)"] = maxes["Max Weight"] * (1 + maxes["Reps at Max Weight"] /
 maxes["E1RM (Brzycki)"] = maxes["Max Weight"] / (1.0278 - 0.0278 * maxes["Reps at Max Weight"])
 maxes["SWR (Epley)"] = maxes["E1RM (Epley)"] / maxes["Weight"]
 maxes["SWR (Brzycki)"] = maxes["E1RM (Brzycki)"] / maxes["Weight"]
+maxes["SWR"] = maxes[["SWR (Epley)", "SWR (Brzycki)"]].mean(axis=1)
 maxes["E1RM"] = (maxes["E1RM (Epley)"] + maxes["E1RM (Brzycki)"]) / 2
 maxes["W1RM"] = 0.9 * maxes["E1RM"]
+maxes["Hypertrophy (6-15 reps)"] = maxes["W1RM"].map(
+    lambda x: f"{x * 0.65:.1f} - {x * 0.8:.1f}"
+    )
+maxes["Strength (3-6 reps)"] = maxes["W1RM"].map(
+    lambda x: f"{x * 0.75:.1f} - {x * 0.9:.1f}"
+    )
+maxes["Power (1-5 reps)"] = maxes["W1RM"].map(
+    lambda x: f"{x * 0.5:.1f} - {x * 0.8:.1f}"
+    )
 previous_maxes = maxes[maxes["Date"] != maxes["Date"].max()]
 
 
@@ -125,8 +135,6 @@ d_SWR = np.round(current_SWR - previous_SWR, 2)
 # page layout columns
 col1, col2, col3, col4 = st.columns(4)  # metrics
 lift_col, weight_col = st.columns(2)  # lift and weight plots
-day_container = st.container(border=True)
-sleep_container = st.container(border=True)
 pr_container = st.container(border=True)  # PR df
 
 
@@ -160,112 +168,36 @@ weight_container.plotly_chart(weight_fig)
 
 
 
-# lifting day plots
-day_container.subheader("Lifting Day")
-
-# select push, pull, legs AND lifting phase
-day_choice = day_container.selectbox("Select Type", ["Push", "Pull", "Legs"])
-
-# get most recent data
-last_lift = data[data["Lifting day"] == day_choice]
-last_lift = last_lift[all_lifts].iloc[-1].dropna().reset_index()  # get most recent and just lifting columns
-last_lift.columns = ["Exercise", "Lift"]
-last_lift = pd.merge(last_lift, maxes[["Exercise", "E1RM", "W1RM"]])
-
-# calculate phase group
-last_lift["Hypertrophy (6-15 reps)"] = last_lift["W1RM"].map(
-    lambda x: f"{x * 0.65:.1f} - {x * 0.8:.1f}"
-    )
-last_lift["Strength (3-6 reps)"] = last_lift["W1RM"].map(
-    lambda x: f"{x * 0.75:.1f} - {x * 0.9:.1f}"
-    )
-last_lift["Power (1-5 reps)"] = last_lift["W1RM"].map(
-    lambda x: f"{x * 0.5:.1f} - {x * 0.8:.1f}"
-    )
-
-
-# for each lift, get W1RM and calculate what phase it falls under
-day_container.write(last_lift)
-
-
-
-
-# sleep plots
-sleep_container.subheader("Sleep Stats")
-sleep_score_col, sleep_radar_col = sleep_container.columns(2)
-
-sleep_score_df = data[["Date", "Last Night's Sleep Energy Score"]].dropna()
-avg_sleep_score = sleep_score_df["Last Night's Sleep Energy Score"].mean()
-
-sleep_score_plot = px.scatter(sleep_score_df, x="Date", y ="Last Night's Sleep Energy Score")
-sleep_score_plot.add_hline(y=avg_sleep_score, line_dash="dash", line_color="orange")
-sleep_score_col.plotly_chart(sleep_score_plot)
-
-sleep_df["Light Sleep (min)"] = sleep_df["Actual Sleep Time (min)"] - sleep_df["Deep Sleep (min)"] - sleep_df["REM Sleep (min)"] - sleep_df["Awake (min)"]
-avg_sleep_df = sleep_df.drop(columns=["Last Night's Sleep Energy Score", "Sleep Time (min)", "Actual Sleep Time (min)"]).mean().reset_index()
-avg_sleep_df.columns = ["stat", "value"]
-avg_sleep_df["value"] = avg_sleep_df["value"] / sleep_df["Actual Sleep Time (min)"].mean() * 100
-avg_sleep_df["low"] = [10, 20, 0, 40]
-avg_sleep_df["high"] = [20, 30, 7, 60]
-
-sleep_metrics = [
-    "Deep Sleep (min)",
-    "REM Sleep (min)",
-    "Awake (min)",
-    "Light Sleep (min)"
-]
-
-# Calculate percentages for each night
-for metric in sleep_metrics:
-    sleep_df[metric] = (
-        sleep_df[metric]
-        / sleep_df["Actual Sleep Time (min)"]
-        * 100
-    )
-
-# Long format
-plot_df = sleep_df[sleep_metrics].melt(
-    var_name="stat",
-    value_name="value"
-)
-
-# Boxplot
-sleep_fig = px.box(
-    plot_df,
-    x="value",
-    y="stat",
-    # orientation="h",
-    # category_orders={"stat": sleep_metrics}
-)
-
-# Target ranges
-for i, row in avg_sleep_df.iterrows():
-    sleep_fig.add_shape(
-        type="rect",
-        x0=row["low"],
-        x1=row["high"],
-        y0=i - 0.4,
-        y1=i + 0.4,
-        fillcolor="grey",
-        opacity=0.5,
-        line_width=0,
-        layer="below"
-    )
-
-sleep_fig.update_layout(
-    xaxis_title="Percentage of Actual Sleep",
-    yaxis_title=None,
-    showlegend=False
-)
-
-
-sleep_radar_col.plotly_chart(sleep_fig)
 
 
 # list table of exercises at bottom with columes of exercise name, lifting day, max weight, SWR
 pr_container.subheader("Personal Records")
 pr_container.text("Ranked by Max Weight")
+day = pr_container.multiselect("Select Type", ["Push", "Pull", "Legs"])
+
 maxes = maxes.sort_values("Max Weight")
-pr_container.dataframe(maxes[["Exercise", "Lift", "Max Weight", "Reps at Max Weight", "E1RM (Epley)", "E1RM (Brzycki)", "SWR (Epley)", "SWR (Brzycki)"]], hide_index=True)
+column_configuration = {
+    "Exercise": st.column_config.Column(
+        "Exercise",
+        pinned=True  # Locks the column to the left side
+    )
+}
+
+pr_container.dataframe(
+    maxes.loc[
+        maxes["Lift"].isin(day),
+        [
+            "Exercise", 
+            "Lift", 
+            "Max Weight", 
+            "Reps at Max Weight", 
+            "SWR", 
+            "E1RM", 
+            "Hypertrophy (6-15 reps)", 
+            "Strength (3-6 reps)", 
+            "Power (1-5 reps)"]
+        ],
+    column_config=column_configuration, 
+    hide_index=True)
 
 
