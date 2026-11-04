@@ -82,7 +82,7 @@ def send_weekly_email():
     url = "https://docs.google.com/spreadsheets/d/1NcRIHGLn1MBLxQE1dgbk55GUWr_ospFCtNKTkVQaZbo/edit?usp=sharing"
     tracker = Tracker(url)
     tracker.format_data()
-    html_table = get_html_week()
+    html_table = get_html_week(tracker)
 
     chart_cid = make_msgid()
 
