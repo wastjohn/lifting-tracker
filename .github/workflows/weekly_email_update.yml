@@ -26,4 +26,4 @@ jobs:
         SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
         RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
       working-directory: ./src/tracker
-      run: python send_email.py
+      run: python weekly_email_update.py
