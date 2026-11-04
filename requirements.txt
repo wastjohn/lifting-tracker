@@ -1,3 +1,6 @@
-pandas
 numpy
+pandas
+plotly
+streamlit
 matplotlib
+streamlit-gsheets
