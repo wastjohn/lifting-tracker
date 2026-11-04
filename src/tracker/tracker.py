@@ -19,10 +19,17 @@ from streamlit_gsheets import GSheetsConnection
 
 class Tracker:
     def __init__(self, spreadsheet_url):
-        conn = st.connection("gsheets", type=GSheetsConnection)
-        data = conn.read(spreadsheet=spreadsheet_url)
+        # conn = st.connection("gsheets", type=GSheetsConnection)
+        # data = conn.read(spreadsheet=spreadsheet_url)
 
-        self.data = data.copy()
+         # Convert standard sharing link to a direct backend CSV export endpoint
+        if "/edit" in spreadsheet_url:
+            csv_url = spreadsheet_url.split("/edit")[0] + "/export?format=csv"
+        else:
+            csv_url = spreadsheet_url
+            
+        # Download straight into memory without needing Streamlit connections
+        self.data = pd.read_csv(csv_url)
         self.weight_fig = None
 
 
