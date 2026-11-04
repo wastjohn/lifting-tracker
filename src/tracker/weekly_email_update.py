@@ -44,8 +44,9 @@ def get_day_stats():
     return
 
 
-def get_html_week():
-    return
+def get_html_week(tracker):
+    html_table = tracker.get_weekly_PRs()
+    return html_table
 
 
 def get_html_weight_plot(tracker):
@@ -81,6 +82,7 @@ def send_weekly_email():
     url = "https://docs.google.com/spreadsheets/d/1NcRIHGLn1MBLxQE1dgbk55GUWr_ospFCtNKTkVQaZbo/edit?usp=sharing"
     tracker = Tracker(url)
     tracker.format_data()
+    html_table = get_html_week()
 
     chart_cid = make_msgid()
 
@@ -103,6 +105,11 @@ def send_weekly_email():
                     alt="Weekly Trend Chart"
                     style="max-width: 100%; height: auto;"
                 >
+            </div>
+
+            <!-- Injected Exercise Table Section -->
+            <div style="margin: 20px 0; overflow-x: auto;">
+                {html_table}
             </div>
 
             <hr>
