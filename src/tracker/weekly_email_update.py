@@ -83,34 +83,49 @@ def send_weekly_email():
     tracker.format_data()
 
     chart_cid = make_msgid()
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
         <body>
-            <h2 style="color: #306998;">Weekly Performance Report</h2>
-            <p>Hello! Here is the automated trend visualization for this week:</p>
-            
-            <!-- This embeds the chart inline -->
+            <h2 style="color: #306998;">
+                Weekly Performance Report
+            </h2>
+
+            <p>
+                Hello! Here is the automated trend visualization
+                for this week:
+            </p>
+
             <div style="margin: 20px 0;">
-                <img src="cid:{chart_cid[1:-1]}" alt="Weekly Trend Chart" style="max-width: 100%; height: auto;">
+                <img
+                    src="cid:{chart_cid[1:-1]}"
+                    alt="Weekly Trend Chart"
+                    style="max-width: 100%; height: auto;"
+                >
             </div>
-            
+
             <hr>
-            <p style="font-size: 12px; color: gray;">Automated via GitHub Actions Cron Job.</p>
+
+            <p style="font-size: 12px; color: gray;">
+                Automated via GitHub Actions Cron Job.
+            </p>
         </body>
     </html>
     """
+
     msg.add_alternative(html_content, subtype="html")
 
     image_data = get_html_weight_plot(tracker)
-    
-    msg.get_payload().add_related(
+
+    html_part = msg.get_payload()[-1]
+
+    html_part.add_related(
         image_data,
         maintype="image",
         subtype="png",
         cid=chart_cid
     )
-
     try:
         with smtplib.SMTP('://gmail.com', 587) as server:
             server.starttls()
