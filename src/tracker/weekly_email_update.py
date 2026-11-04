@@ -127,13 +127,24 @@ def send_weekly_email():
         cid=chart_cid
     )
     try:
-        with smtplib.SMTP('://gmail.com', 587) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
             server.starttls()
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.send_message(msg)
-        print("Email with chart sent successfully!")
+
+            server.login(
+                SENDER_EMAIL,
+                SENDER_PASSWORD
+            )
+
+            refused = server.send_message(msg)
+
+            if refused:
+                print(f"Recipients refused: {refused}")
+            else:
+                print("Gmail accepted the message.")
+
     except Exception as e:
         print(f"Failed to send email: {e}")
+        raise
 
 if __name__ == "__main__":
     send_weekly_email()
