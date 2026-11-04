@@ -40,29 +40,23 @@ from email.utils import make_msgid
 from tracker import Tracker
 
 
-def get_day_stats():
-    return
-
 
 def get_html_week(tracker):
     html_table = tracker.get_weekly_PRs()
     return html_table
 
 
-def get_html_weight_plot(tracker):
-    fig = tracker.get_weight_plot()
+def get_html_progress_plot(tracker):
+    tracker.create_fig((12, 10), 8, 3)
+    tracker.add_weekly_steps_plot()
+    tracker.add_weekly_weight_plot()
+    tracker.add_weekly_sleep_plot()
+    tracker.add_weight_plot()
+    fig = tracker.get_fig()
     img_buf = io.BytesIO()
     fig.savefig(img_buf, format="png", bbox_inches='tight', dpi=150)
     img_buf.seek(0)
     return img_buf.read()
-
-
-def get_html_sleep_plot():
-    return
-
-
-def get_html_steps_plot():
-    return
 
 
 def get_html_PRs():
@@ -123,7 +117,7 @@ def send_weekly_email():
 
     msg.add_alternative(html_content, subtype="html")
 
-    image_data = get_html_weight_plot(tracker)
+    image_data = get_html_progress_plot(tracker)
 
     html_part = msg.get_payload()[-1]
 
