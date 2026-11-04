@@ -185,6 +185,21 @@ class Tracker:
             date_str = date_obj.strftime('%b %d')
             
             day_list = []
+
+            # --- Insert Phase and Lifting Day as the top rows ---
+            phase_val = str(row.get('Lifting phase', '')).strip()
+            day_val = str(row.get('Lifting day', '')).strip()
+            
+            # If the values exist and aren't null string representations
+            if phase_val and phase_val.lower() != 'nan':
+                day_list.append(f"<span class='meta-tag phase-tag'>{phase_val}</span>")
+            else:
+                day_list.append("<span class='meta-tag empty-tag'>-</span>")
+                
+            if day_val and day_val.lower() != 'nan':
+                day_list.append(f"<span class='meta-tag day-tag'>{day_val}</span>")
+            else:
+                day_list.append("<span class='meta-tag empty-tag'>-</span>")
             
             # 3. Iterate through exercises in the exact sequence of your column index
             for exercise in exercise_cols:
@@ -212,20 +227,8 @@ class Tracker:
 
         # 5. Build the final structured HTML document
         html_df = pd.DataFrame(days_dict)
-
-        css_style = """
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 25px; background-color: #f4f6f8; }
-            table { border-collapse: collapse; width: 100%; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
-            th { background-color: #1e293b; color: #ffffff; padding: 14px 16px; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #1e293b; text-align: center; }
-            td { padding: 14px 16px; vertical-align: top; border: 1px solid #e2e8f0; font-size: 13px; line-height: 1.6; color: #334155; min-width: 140px; }
-            tr:nth-child(even) td { background-color: #f8fafc; }
-            strong { color: #0f172a; font-size: 13px; display: block; margin-bottom: 3px; }
-            .sets { color: #64748b; font-size: 12px; display: block; margin-bottom: 12px; }
-        </style>
-        """
-
         html_table = html_df.to_html(index=False, escape=False, classes="workout-table")
+
         return html_table
 
 

@@ -83,6 +83,23 @@ def send_weekly_email():
     html_content = f"""
     <!DOCTYPE html>
     <html>
+        <head>
+            <style>
+                table.workout-table {{ border-collapse: collapse; width: 100%; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); margin: 15px 0; }}
+                table.workout-table th {{ background-color: #1e293b; color: #ffffff; padding: 12px 14px; font-family: sans-serif; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #1e293b; text-align: center; }}
+                table.workout-table td {{ padding: 12px 14px; vertical-align: top; border: 1px solid #e2e8f0; font-family: sans-serif; font-size: 13px; line-height: 1.5; color: #334155; min-width: 130px; }}
+                table.workout-table tr:nth-child(even) td {{ background-color: #f8fafc; }}
+                
+                /* Meta tags layout for Phase and Lifting Day rows */
+                table.workout-table .meta-tag {{ display: block; text-align: center; font-size: 11px; font-weight: bold; text-transform: uppercase; border-radius: 4px; padding: 4px 6px; margin-bottom: 6px; font-family: sans-serif; }}
+                table.workout-table .phase-tag {{ background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }}
+                table.workout-table .day-tag {{ background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }}
+                table.workout-table .empty-tag {{ background-color: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; font-weight: normal; }}
+                
+                table.workout-table strong {{ color: #0f172a; font-size: 13px; display: block; margin-top: 8px; margin-bottom: 2px; }}
+                table.workout-table .sets {{ color: #64748b; font-size: 12px; display: block; margin-bottom: 10px; }}
+            </style>
+        </head>
         <body>
             <h2 style="color: #306998;">
                 Weekly Performance Report
